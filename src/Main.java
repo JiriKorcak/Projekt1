@@ -1,5 +1,6 @@
 import com.engeto.restaurant.*;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 public class Main {
@@ -8,7 +9,7 @@ public class Main {
 
         Dish dish1 = null;
         try {
-            dish1 = new Dish("Boloňské špagety", 179, LocalTime.of(0, 45),
+            dish1 = new Dish("Boloňské špagety", BigDecimal.valueOf(179), LocalTime.of(0, 45),
                     "bolonske_spagety_01");
         } catch (RestaurantException e) {
             System.err.println ("Chyba při zadání pokrmu: " + e.getLocalizedMessage());
@@ -16,7 +17,7 @@ public class Main {
 
         Dish dish2 = null;
         try {
-            dish2 = new Dish("Minerální voda", 29, LocalTime.of(0, 5),
+            dish2 = new Dish("Minerální voda", BigDecimal.valueOf(29), LocalTime.of(0, 5),
                     "mineralni_voda_01");
         } catch (RestaurantException e) {
             System.err.println ("Chyba při zadání pokrmu: " + e.getLocalizedMessage());
@@ -28,7 +29,7 @@ public class Main {
         cookBook.addDish(dish1);
         cookBook.addDish(dish2);
 
-        dish1.setPrice(209);
+        dish1.setPrice(BigDecimal.valueOf(209));
 
         System.out.println("změna " + cookBook.getDish(0));
 
@@ -43,9 +44,25 @@ public class Main {
         System.out.println(order1.getIsPaid());
         System.out.println(order1);
 
+        order1.sortedOut();
         order1.pay();
 
         System.out.println(order1);
+
+        try {
+            CookBook.saveToFile("cookbook.txt", cookBook);
+        } catch (RestaurantException e) {
+            System.err.println("Chyba při zápisu do souboru: " + e.getLocalizedMessage());
+        }
+
+        CookBook cookBook2 = new CookBook();
+        try {
+            cookBook2 = CookBook.loadFromFile("readCookbook.txt");
+        } catch (RestaurantException e) {
+            System.err.println("Chyba při čtení ze souboru: " + e.getLocalizedMessage());
+        }
+
+        System.out.println(cookBook2);
 
 
 

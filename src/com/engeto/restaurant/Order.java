@@ -5,14 +5,21 @@ import java.time.format.DateTimeFormatter;
 
 public class Order {
 
+    private static int nextId = 1;
+    private int id = nextId++;
     private int table;
     private Dish orderDish;
     private int numberOfDish;
     private LocalTime orderedTime;
     private LocalTime fulfilmentTime = null;
     private IsPaid isPaid;
+    private IsSortedOut isSortedOut;
 
 private enum IsPaid {
+    YES,
+    NO
+}
+private enum IsSortedOut {
     YES,
     NO
 }
@@ -23,8 +30,13 @@ private enum IsPaid {
         this.numberOfDish = numberOfDish;
         this.orderedTime = LocalTime.now();
         this.isPaid = IsPaid.NO;
+        this.isSortedOut = IsSortedOut.NO;
 
 
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getTable() {
@@ -40,8 +52,7 @@ private enum IsPaid {
     }
 
     public LocalTime getOrderedTime() {
-        DateTimeFormatter formatte = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return LocalTime.parse(formatte.format(orderedTime));
+        return Settings.writeFormatteTime(orderedTime);
     }
 
     public LocalTime getFulfilmentTime() {
@@ -49,8 +60,7 @@ private enum IsPaid {
             return null;
         }
         else {
-            DateTimeFormatter formatte = DateTimeFormatter.ofPattern("HH:mm:ss");
-            return LocalTime.parse(formatte.format(fulfilmentTime));
+            return Settings.writeFormatteTime(fulfilmentTime);
         }
     }
 
@@ -59,26 +69,49 @@ private enum IsPaid {
     }
     public void pay() {
         isPaid = IsPaid.YES;
-        fulfilmentTime = LocalTime.now();
     }
     public String writeIsPaid() {
         if (isPaid.equals(IsPaid.NO)) {
-            return "není";
+            return "nezaplacena";
         }
         else {
-            return "je";
+            return "zaplacena";
+        }
+    }
+    public IsSortedOut getIsSortedOut() {
+        return isSortedOut;
+    }
+    public void sortedOut() {
+        isSortedOut = IsSortedOut.YES;
+        fulfilmentTime = LocalTime.now();
+    }
+
+    public String writeIsSortedOut() {
+        if (isSortedOut.equals(isSortedOut.NO)) {
+            return "nevyřízena";
+        }
+        else {
+            return "vyřízena";
+        }
+    }
+
+    public String writeIsSortedOutWithTime() {
+        if (isSortedOut.equals(isSortedOut.NO)) {
+            return "nevyřízena";
+        }
+        else {
+            return "vyřízena v " + Settings.writeFormatteTime(fulfilmentTime);
         }
     }
 
     @Override
     public String toString() {
-        return "Orders{" +
-                "table=" + table +
-                ", orderDish=" + orderDish +
-                ", numberOfDish=" + numberOfDish +
-                ", orderedTime=" + getOrderedTime() +
-                ", fulfilmentTime=" + getFulfilmentTime() + ", objednávka " +
-                writeIsPaid() + " zaplacena" +
-                '}';
+        return "Objednávka č." + getId() +
+                " ke stolu " + table +
+                " : objednáno " + numberOfDish + " ks " + getOrderDish() +
+                " dnes v " + getOrderedTime() +
+                ". Objednávka je " +
+                writeIsSortedOutWithTime() + " a je " +
+                writeIsPaid() + ".";
     }
 }

@@ -1,8 +1,8 @@
 package com.engeto.restaurant;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class CookBook {
                     "Nesprávný počet položek na řádku: " + line + "! Počet položek: " + numOfBlocks + ".");
         }
         String name = blocks[0].trim();
-        int price = Integer.parseInt(blocks[1].trim());
+        BigDecimal price = new BigDecimal(blocks[1].trim());
         LocalTime preparationTime = LocalTime.parse(blocks[2].trim());
         String image = blocks[3].trim();
 
@@ -53,6 +53,25 @@ public class CookBook {
         cookBook.addDish(newDish);
     }
 
+    public static void saveToFile(String filename, CookBook cookBook) throws RestaurantException {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))) {
+            for (Dish dish : cookBook.getCookBook()) {
+                writer.println(dish.getName() + Settings.getFileDelimiter() +
+                        dish.getPrice() + Settings.getFileDelimiter() +
+                        dish.getPreparationTime() + Settings.getFileDelimiter() +
+                        dish.getImage());
+            }
+        } catch (IOException e) {
+            throw new RestaurantException("Chyba při zápisu do souboru '" + filename + "' : " + e.getLocalizedMessage());
+        }
 
 
+    }
+
+    @Override
+    public String toString() {
+        return "CookBook{" +
+                "cookBook=" + cookBook +
+                '}';
+    }
 }

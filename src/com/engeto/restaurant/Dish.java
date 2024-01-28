@@ -1,5 +1,6 @@
 package com.engeto.restaurant;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 public class Dish {
@@ -7,12 +8,12 @@ public class Dish {
     private static int nextId = 1;
     private int id = nextId++;
     private String name;
-    private int price;
+    private BigDecimal price;
     private LocalTime preparationTime;
     private String image;
 
 
-    public Dish(String name, int price, LocalTime preparationTime, String image) throws RestaurantException {
+    public Dish(String name, BigDecimal price, LocalTime preparationTime, String image) throws RestaurantException {
         this.name = name;
         this.price = price;
         int value = preparationTime.compareTo(LocalTime.MIN);
@@ -23,7 +24,7 @@ public class Dish {
         this.image = image;
     }
 
-    public Dish(String name, int price, LocalTime preparationTime) throws RestaurantException{
+    public Dish(String name, BigDecimal price, LocalTime preparationTime) throws RestaurantException{
         this.name = name;
         this.price = price;
         int value = preparationTime.compareTo(LocalTime.MIN);
@@ -44,11 +45,11 @@ public class Dish {
         this.name = name;
     }
 
-    public int getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -80,6 +81,6 @@ public class Dish {
                 ", price=" + price +
                 ", preparationTime=" + preparationTime +
                 ", image='" + image + '\'' +
-                '}';
+                '}' + "\n";
     }
 }
