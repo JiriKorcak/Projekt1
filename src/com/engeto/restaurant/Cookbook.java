@@ -12,7 +12,8 @@ public class Cookbook {
     private List<Dish> cookbook = new ArrayList<>();
 
     public List<Dish> getCookbook() {
-        return cookbook;
+        List<Dish> i = cookbook;
+        return i;
     }
     public void addDish(Dish dish) {
         cookbook.add(dish);
@@ -61,9 +62,9 @@ public class Cookbook {
         cookbook.addDish(newDish);
     }
 
-    public static void saveToFile(String filename, Cookbook cookbook) throws RestaurantException {
+    public void saveToFile(String filename) throws RestaurantException {
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))) {
-            for (Dish dish : cookbook.getCookbook()) {
+            for (Dish dish : cookbook) {
                 writer.println(dish.getDishNumber() + Settings.getFileDelimiter() +
                         dish.getName() + Settings.getFileDelimiter() +
                         dish.getPrice() + Settings.getFileDelimiter() +

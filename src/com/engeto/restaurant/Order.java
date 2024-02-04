@@ -12,17 +12,9 @@ public class Order {
     private int numberOfDish;
     private LocalTime orderedTime;
     private LocalTime fulfilmentTime = LocalTime.MIN;
-    private IsPaid isPaid;
-    private IsSortedOut isSortedOut;
+    private YesOrNot isPaid;
+    private YesOrNot isSortedOut;
 
-public enum IsPaid {
-    YES,
-    NO
-}
-private enum IsSortedOut {
-    YES,
-    NO
-}
 
     public Order(int orderId, int table, int orderDishNumber, int numberOfDish, LocalTime orderedTime,
                  LocalTime fulfilmentTime, String isSortedOut, String isPaid, Cookbook cookbook) {
@@ -33,8 +25,8 @@ private enum IsSortedOut {
         this.numberOfDish = numberOfDish;
         this.orderedTime = orderedTime;
         this.fulfilmentTime = fulfilmentTime;
-        this.isSortedOut = IsSortedOut.valueOf(isSortedOut);
-        this.isPaid = IsPaid.valueOf(isPaid);
+        this.isSortedOut = YesOrNot.valueOf(isSortedOut);
+        this.isPaid = YesOrNot.valueOf(isPaid);
         nextId = id+1;
 
 
@@ -47,8 +39,8 @@ private enum IsSortedOut {
         this.orderDish = cookbook.getDish(orderDishNumber);
         this.numberOfDish = numberOfDish;
         this.orderedTime = LocalTime.now();
-        this.isSortedOut = IsSortedOut.NO;
-        this.isPaid = IsPaid.NO;
+        this.isSortedOut = YesOrNot.NO;
+        this.isPaid = YesOrNot.NO;
 
 
 
@@ -75,22 +67,17 @@ private enum IsSortedOut {
     }
 
     public LocalTime getFulfilmentTime() {
-//        if (fulfilmentTime == null) {
-//            return null;
-//        }
-//        else {
             return Settings.writeFormatteTime(fulfilmentTime);
-//        }
     }
 
-    public IsPaid getIsPaid() {
+    public YesOrNot getIsPaid() {
         return isPaid;
     }
     public void pay() {
-        isPaid = IsPaid.YES;
+        isPaid = YesOrNot.YES;
     }
     public String writeIsPaid() {
-        if (isPaid.equals(IsPaid.NO)) {
+        if (isPaid.equals(YesOrNot.NO)) {
             return "nezaplacena";
         }
         else {
@@ -100,16 +87,16 @@ private enum IsSortedOut {
     public int getOrderDishNumber() {
         return orderDishNumber;
     }
-    public IsSortedOut getIsSortedOut() {
+    public YesOrNot getIsSortedOut() {
         return isSortedOut;
     }
     public void sortedOut() {
-        isSortedOut = IsSortedOut.YES;
+        isSortedOut = YesOrNot.YES;
         fulfilmentTime = LocalTime.now();
     }
 
     public String writeIsSortedOut() {
-        if (isSortedOut.equals(IsSortedOut.NO)) {
+        if (isSortedOut.equals(YesOrNot.NO)) {
             return "nevyřízena";
         }
         else {
@@ -118,7 +105,7 @@ private enum IsSortedOut {
     }
 
     public String writeIsSortedOutWithTime() {
-        if (isSortedOut.equals(IsSortedOut.NO)) {
+        if (isSortedOut.equals(YesOrNot.NO)) {
             return "nevyřízena";
         }
         else {

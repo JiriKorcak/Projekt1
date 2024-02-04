@@ -59,13 +59,15 @@ public class Main {
         System.out.println(order1.getIsPaid());
         System.out.println(order1);
 
+        System.out.println("\n trvání objednávky 4 : " + ordersList.averageSortedOutTime());
+
         order1.sortedOut();
         order1.pay();
 
         System.out.println(order1);
 
         try {
-            Cookbook.saveToFile("cookbook.txt", cookbook);
+            cookbook.saveToFile("cookbook.txt");
             System.out.println("Uloženo.");
         } catch (RestaurantException e) {
             System.err.println("Chyba při zápisu do souboru: " + e.getLocalizedMessage());
@@ -84,7 +86,7 @@ public class Main {
         System.out.println("-----------------");
 
         try {
-            OrdersList.saveToFile("orderslist.txt", ordersList);
+            ordersList.saveToFile("orderslist.txt");
             System.out.println("Uloženo.");
         } catch (RestaurantException e) {
             System.err.println("Chyba při zápisu do soubou: " + e.getLocalizedMessage());
@@ -104,6 +106,17 @@ public class Main {
         Order order6 = new Order(5,11,2,cookbook2);
         ordersList2.addOrder(order6);
         System.out.println("**************\n" + ordersList2);
+
+        System.out.println("Aktuálně je " + ordersList2.countNotSortedOrder() +
+                " rozpracovaných a " + ordersList2.countNotPaid() + " nezaplacených.");
+
+        ordersList2.sortByOrderedTime();
+        System.out.println("Seřazený: \n" + ordersList2);
+
+        System.out.println("\n -------------- \n" + ordersList2.averageSortedOutTime());
+        System.out.println("velikost " + ordersList2.getSize());
+
+        System.out.println(ordersList2.writeDayOrderedDish());
 
 
 ////          OPAKOVANY TEST
