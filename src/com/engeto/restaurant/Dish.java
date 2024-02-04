@@ -5,15 +5,17 @@ import java.time.LocalTime;
 
 public class Dish {
 
-    private static int nextId = 1;
-    private int id = nextId++;
+//    private static int nextId = 1;
+//    private int id = nextId++;
+    private int dishNumber;
     private String name;
     private BigDecimal price;
     private LocalTime preparationTime;
     private String image;
 
 
-    public Dish(String name, BigDecimal price, LocalTime preparationTime, String image) throws RestaurantException {
+    public Dish(int dishNumber, String name, BigDecimal price, LocalTime preparationTime, String image) throws RestaurantException {
+        this.dishNumber = dishNumber;
         this.name = name;
         this.price = price;
         int value = preparationTime.compareTo(LocalTime.MIN);
@@ -24,7 +26,8 @@ public class Dish {
         this.image = image;
     }
 
-    public Dish(String name, BigDecimal price, LocalTime preparationTime) throws RestaurantException{
+    public Dish(int dishNumber, String name, BigDecimal price, LocalTime preparationTime) throws RestaurantException{
+        this.dishNumber = dishNumber;
         this.name = name;
         this.price = price;
         int value = preparationTime.compareTo(LocalTime.MIN);
@@ -36,7 +39,12 @@ public class Dish {
     }
 
 
-
+    public int getDishNumber() {
+        return dishNumber;
+    }
+    public void setDishNumber(int dishNumber) {
+        this.dishNumber = dishNumber;
+    }
     public String getName() {
         return name;
     }
@@ -69,14 +77,11 @@ public class Dish {
         this.image = image;
     }
 
-    public int getId() {
-        return id;
-    }
 
     @Override
     public String toString() {
         return "Dish{" +
-                "id=" + id +
+                "id=" + dishNumber +
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", preparationTime=" + preparationTime +

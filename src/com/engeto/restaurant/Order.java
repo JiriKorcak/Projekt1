@@ -1,21 +1,21 @@
 package com.engeto.restaurant;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class Order {
 
     private static int nextId = 1;
-    private int id = nextId++;
+    private int id;
     private int table;
+    private int orderDishNumber;
     private Dish orderDish;
     private int numberOfDish;
     private LocalTime orderedTime;
-    private LocalTime fulfilmentTime = null;
+    private LocalTime fulfilmentTime = LocalTime.MIN;
     private IsPaid isPaid;
     private IsSortedOut isSortedOut;
 
-private enum IsPaid {
+public enum IsPaid {
     YES,
     NO
 }
@@ -24,13 +24,32 @@ private enum IsSortedOut {
     NO
 }
 
-    public Order(int table, Dish orderDish, int numberOfDish) {
+    public Order(int orderId, int table, int orderDishNumber, int numberOfDish, LocalTime orderedTime,
+                 LocalTime fulfilmentTime, String isSortedOut, String isPaid, Cookbook cookbook) {
+        this.id = orderId;
         this.table = table;
-        this.orderDish = orderDish;
+        this.orderDishNumber = orderDishNumber;
+        this.orderDish = cookbook.getDish(orderDishNumber);
+        this.numberOfDish = numberOfDish;
+        this.orderedTime = orderedTime;
+        this.fulfilmentTime = fulfilmentTime;
+        this.isSortedOut = IsSortedOut.valueOf(isSortedOut);
+        this.isPaid = IsPaid.valueOf(isPaid);
+        nextId = id+1;
+
+
+    }
+
+    public Order(int table, int orderDishNumber, int numberOfDish, Cookbook cookbook) {
+        this.id = nextId++;
+        this.table = table;
+        this.orderDishNumber = orderDishNumber;
+        this.orderDish = cookbook.getDish(orderDishNumber);
         this.numberOfDish = numberOfDish;
         this.orderedTime = LocalTime.now();
-        this.isPaid = IsPaid.NO;
         this.isSortedOut = IsSortedOut.NO;
+        this.isPaid = IsPaid.NO;
+
 
 
     }
@@ -43,7 +62,7 @@ private enum IsSortedOut {
         return table;
     }
 
-    public String getOrderDish() {
+    public String getOrderDishName() {
         return orderDish.getName();
     }
 
@@ -56,12 +75,12 @@ private enum IsSortedOut {
     }
 
     public LocalTime getFulfilmentTime() {
-        if (fulfilmentTime == null) {
-            return null;
-        }
-        else {
+//        if (fulfilmentTime == null) {
+//            return null;
+//        }
+//        else {
             return Settings.writeFormatteTime(fulfilmentTime);
-        }
+//        }
     }
 
     public IsPaid getIsPaid() {
@@ -78,6 +97,9 @@ private enum IsSortedOut {
             return "zaplacena";
         }
     }
+    public int getOrderDishNumber() {
+        return orderDishNumber;
+    }
     public IsSortedOut getIsSortedOut() {
         return isSortedOut;
     }
@@ -87,7 +109,7 @@ private enum IsSortedOut {
     }
 
     public String writeIsSortedOut() {
-        if (isSortedOut.equals(isSortedOut.NO)) {
+        if (isSortedOut.equals(IsSortedOut.NO)) {
             return "nevyřízena";
         }
         else {
@@ -96,7 +118,7 @@ private enum IsSortedOut {
     }
 
     public String writeIsSortedOutWithTime() {
-        if (isSortedOut.equals(isSortedOut.NO)) {
+        if (isSortedOut.equals(IsSortedOut.NO)) {
             return "nevyřízena";
         }
         else {
@@ -108,10 +130,10 @@ private enum IsSortedOut {
     public String toString() {
         return "Objednávka č." + getId() +
                 " ke stolu " + table +
-                " : objednáno " + numberOfDish + " ks " + getOrderDish() +
+                " : objednáno " + numberOfDish + " ks " + getOrderDishName() +
                 " dnes v " + getOrderedTime() +
                 ". Objednávka je " +
                 writeIsSortedOutWithTime() + " a je " +
-                writeIsPaid() + ".";
+                writeIsPaid() + ".\n";
     }
 }
