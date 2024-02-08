@@ -1,11 +1,10 @@
 package com.engeto.restaurant;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.time.Period;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.ValueRange;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
@@ -36,10 +35,15 @@ public class OrdersList {
 
     public static OrdersList loadFromFile(String filename, Cookbook cookbook) throws RestaurantException {
         OrdersList result = new OrdersList();
+        if (cookbook.getSize()==0) {
+            throw new RestaurantException("Kuchařka je prázdná!");
+        }
+        int lineNumber = 1;
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(filename)))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                parseLine(line, result, cookbook);
+                parseLine(line, result, cookbook, lineNumber);
+                lineNumber++;
             }
         } catch (FileNotFoundException e) {
             throw new RestaurantException("Nepodařilo se nalézt soubor " + filename + ": " + e.getLocalizedMessage());
@@ -47,7 +51,7 @@ public class OrdersList {
         return result;
     }
 
-    private static void parseLine(String line, OrdersList ordersList, Cookbook cookbook) throws RestaurantException {
+    private static void parseLine(String line, OrdersList ordersList, Cookbook cookbook, int lineNumber) throws RestaurantException {
         String[] blocks = line.split("\t");
         int numOfBlocks = blocks.length;
         int needNumOfBlocks = 8;
@@ -56,12 +60,49 @@ public class OrdersList {
                     "Nesprávný počet položek na řádku: " + line +
                             "! Počet položek: " + numOfBlocks + " z " + needNumOfBlocks + ".");
         }
-            int id = Integer.parseInt(blocks[0].trim());
-            int table = Integer.parseInt(blocks[1].trim());
-            int orderDishNumber = Integer.parseInt(blocks[2].trim());
-            int numberOfDish = Integer.parseInt(blocks[3].trim());
-            LocalTime orderedTime = LocalTime.parse(blocks[4].trim());
-            LocalTime fulfilmentTime = LocalTime.parse(blocks[5].trim());
+        int id;
+        int table;
+        int orderDishNumber;
+        int numberOfDish;
+        LocalTime orderedTime;
+        LocalTime fulfilmentTime;
+
+        try {
+            id = Integer.parseInt(blocks[0].trim());
+        } catch (Exception e) {
+            throw new RestaurantException("Chybně zadáno číslo objednávky: " + blocks[0] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
+        try {
+            table = Integer.parseInt(blocks[1].trim());
+        } catch (Exception e) {
+            throw new RestaurantException("Chybně zadáno číslo stolu: " + blocks[0] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
+        try {
+            orderDishNumber = Integer.parseInt(blocks[2].trim());
+        } catch (Exception e) {
+            throw new RestaurantException("Chybně zadáno číslo jídla: " + blocks[0] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
+        try {
+            numberOfDish = Integer.parseInt(blocks[3].trim());
+        } catch (Exception e) {
+            throw new RestaurantException("Chybně zadán počet jídel: " + blocks[0] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
+        try {
+            orderedTime = LocalTime.parse(blocks[4].trim());
+        } catch (DateTimeException e) {
+            throw new RestaurantException("Chybně zadáno číslo objednávky: " + blocks[0] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
+        try {
+            fulfilmentTime = LocalTime.parse(blocks[5].trim());
+        } catch (DateTimeException e) {
+            throw new RestaurantException("Chybně zadáno číslo objednávky: " + blocks[0] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
             String isSortedOut = blocks[6].trim();
             String isPaid = blocks[7].trim();
 
@@ -112,7 +153,7 @@ public class OrdersList {
         orderList.sort(comparing(Order::getOrderedTime));
     }
 
-    public String averageSortedOutTime() {
+    public void writeAverageSortedOutTime() {
         long size = 0;
         long averageTime = 0;
         for (Order order: orderList) {
@@ -124,23 +165,47 @@ public class OrdersList {
             }
         }
         long result = averageTime / size;
-        return ("Průměrná doba vyřízení objednávky je " + result + " minut.");
+        System.out.println("Průměrná doba vyřízení objednávky je " + result + " minut.");
     }
 
-    public String writeDayOrderedDish() {
+    public void writeDayOrderedDish() {
         Set<String> dishList = new HashSet<>();
         for (Order order : orderList) {
             dishList.add(order.getOrderDishName());
         }
-        return ("Jídla která byla dnes objednána: " + dishList);
+        System.out.println("Jídla která byla dnes objednána: " + dishList);
     }
-//region    Výpis na obrazovku
 
-//    private String firstLine (int table) {
-//
-//    }
+    public void writeOrderForTable (int table) throws RestaurantException {
+        String tableTwoDigit;
+        if (table <= 0) {
+            throw new RestaurantException ("Číslo stolu nesmí být menší než 0!");
+        }
+        tableTwoDigit = (table < 10 ? "0" : " ") + table;
+        System.out.println("** Objednávky pro stůl č. " + tableTwoDigit + " **" +
+                "\n****");
+        for (Order order : orderList) {
+            if ( order.getTable() == table) {
+                System.out.println(order.getId() + " " + order.getOrderDishName() + " " +
+                        order.getNumberOfDish() + "x (" + order.getFinalPrice() + " Kč):" + "\t" +
+                        order.getOrderedTime() + "-" + order.getFulfilmentTime() + "\t" + order.writeIsPaidYes());
+            }
+        }
+        System.out.println("******");
+        }
 
-//endregion
+    public void writeTableFinalPrice (int table) throws RestaurantException {
+        BigDecimal tableFinalPrice = BigDecimal.ZERO;
+        if (table <= 0) {
+            throw new RestaurantException ("Číslo stolu nesmí být menší než 0!");
+        }
+        for (Order order : orderList) {
+            if (order.getTable()==table && order.getIsPaid().equals(YesOrNot.NO)) {
+                tableFinalPrice = tableFinalPrice.add(order.getFinalPrice());
+            }
+        }
+        System.out.println("Celková cena pro stůl " + table + " je " + tableFinalPrice + " Kč.");
+    }
 
     @Override
     public String toString() {

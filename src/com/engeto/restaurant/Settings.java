@@ -12,7 +12,7 @@ public class Settings {
     }
 
     public static LocalTime writeFormatteTime(LocalTime time) {
-        DateTimeFormatter formatte = DateTimeFormatter.ofPattern("HH:mm:ss");
+        DateTimeFormatter formatte = DateTimeFormatter.ofPattern("HH:mm");
         return LocalTime.parse(formatte.format(time));
     }
 }

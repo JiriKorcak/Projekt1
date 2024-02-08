@@ -2,6 +2,7 @@ package com.engeto.restaurant;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.time.DateTimeException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +31,25 @@ public class Cookbook {
         }
         return i;
     }
+    public int getSize() {
+        return cookbook.size();
+    }
 
     public static Cookbook loadFromFile(String filename) throws RestaurantException {
        Cookbook result = new Cookbook();
+       int lineNumber = 1;
        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(filename)))) {
            while (scanner.hasNextLine()) {
                String line = scanner.nextLine();
-               parseLine(line, result);
+               parseLine(line, result, lineNumber);
+               lineNumber++;
            }
        } catch (FileNotFoundException e) {
            throw new RestaurantException("Nepodařilo se nalézt soubor " + filename + ": " + e.getLocalizedMessage());
        }
        return result;
     }
-    private static void parseLine(String line, Cookbook cookbook) throws RestaurantException {
+    private static void parseLine(String line, Cookbook cookbook, int lineNumber) throws RestaurantException {
         String[] blocks = line.split("\t");
         int numOfBlocks = blocks.length;
         int needNumOfBlocks = 5;
@@ -52,10 +58,28 @@ public class Cookbook {
                     "Nesprávný počet položek na řádku: " + line +
                             "! Počet položek: " + numOfBlocks + " z " + needNumOfBlocks + ".");
         }
-        int dishNumber = Integer.parseInt(blocks[0].trim());
+        int dishNumber;
+        BigDecimal price;
+        LocalTime preparationTime;
+        try {
+            dishNumber = Integer.parseInt(blocks[0].trim());
+        } catch (Exception e) {
+            throw new RestaurantException("Chybně zadané číslo jídla " + blocks[0] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
         String name = blocks[1].trim();
-        BigDecimal price = new BigDecimal(blocks[2].trim());
-        LocalTime preparationTime = LocalTime.parse(blocks[3].trim());
+        try {
+            price = new BigDecimal(blocks[2].trim());
+        } catch (NumberFormatException e) {
+            throw new RestaurantException("Chybně zadaná cena jídla  " + blocks[2] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
+        try {
+            preparationTime = LocalTime.parse(blocks[3].trim());
+        } catch (DateTimeException e) {
+            throw new RestaurantException("Chybně zadaná doba přípravy jídla  " + blocks[3] +
+                    " na řádku " + lineNumber + "! Chybný zápis řádku: '" + line + "'");
+        }
         String image = blocks[4].trim();
 
         Dish newDish = new Dish(dishNumber, name, price, preparationTime, image);

@@ -1,0 +1,12 @@
+1	Kuřecí řízek obalovaný 150 g	150	00:30	rizek_01
+2	Hranolky 150 g	79	00:15	hranolky_01
+3	Pstruh na víně 200 g	170	00:25	pstruh_01
+4	Kofola 0,5 l	35	00:05	kofola_01
+1	Kuřecí řízek obalovaný 150 g	150	00:30	rizek_01
+2	Hranolky 150 g	79	00:15	hranolky_01
+3	Pstruh na víně 200 g	170	00:25	pstruh_01
+4	Kofola 0,5 l	35	00:05	kofola_01
+1	Kuřecí řízek obalovaný 150 g	150	00:30	rizek_01
+2	Hranolky 150 g	79	00:15	hranolky_01
+3	Pstruh na víně 200 g	170	00:25	pstruh_01
+4	Kofola 0,5 l	35	00:05	kofola_01

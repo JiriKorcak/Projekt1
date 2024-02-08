@@ -1,5 +1,6 @@
 package com.engeto.restaurant;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 public class Order {
@@ -17,11 +18,14 @@ public class Order {
 
 
     public Order(int orderId, int table, int orderDishNumber, int numberOfDish, LocalTime orderedTime,
-                 LocalTime fulfilmentTime, String isSortedOut, String isPaid, Cookbook cookbook) {
+                 LocalTime fulfilmentTime, String isSortedOut, String isPaid, Cookbook cookbook) throws RestaurantException{
         this.id = orderId;
         this.table = table;
         this.orderDishNumber = orderDishNumber;
         this.orderDish = cookbook.getDish(orderDishNumber);
+        if (orderDish==null) {
+            throw new RestaurantException("Jídlo není v kuchařce!");
+        }
         this.numberOfDish = numberOfDish;
         this.orderedTime = orderedTime;
         this.fulfilmentTime = fulfilmentTime;
@@ -32,11 +36,14 @@ public class Order {
 
     }
 
-    public Order(int table, int orderDishNumber, int numberOfDish, Cookbook cookbook) {
+    public Order(int table, int orderDishNumber, int numberOfDish, Cookbook cookbook) throws RestaurantException{
         this.id = nextId++;
         this.table = table;
         this.orderDishNumber = orderDishNumber;
         this.orderDish = cookbook.getDish(orderDishNumber);
+        if (orderDish==null) {
+            throw new RestaurantException("Jídlo není v kuchařce!");
+        }
         this.numberOfDish = numberOfDish;
         this.orderedTime = LocalTime.now();
         this.isSortedOut = YesOrNot.NO;
@@ -84,6 +91,11 @@ public class Order {
             return "zaplacena";
         }
     }
+    public String writeIsPaidYes() {
+        if (isPaid.equals(YesOrNot.YES)) {
+            return "zaplacena";
+        } else return "";
+    }
     public int getOrderDishNumber() {
         return orderDishNumber;
     }
@@ -111,6 +123,11 @@ public class Order {
         else {
             return "vyřízena v " + Settings.writeFormatteTime(fulfilmentTime);
         }
+    }
+
+    public BigDecimal getFinalPrice () {
+        BigDecimal numberOfDishBD = BigDecimal.valueOf(numberOfDish);
+        return (orderDish.getPrice().multiply(numberOfDishBD));
     }
 
     @Override
